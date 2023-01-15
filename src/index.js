@@ -42,16 +42,43 @@ function renderOneToy(obj) {
   // Add toy card to DOM
   const toyCollection = document.querySelector("#toy-collection");
   toyCollection.appendChild(cardTag)
+
+
+  // Select like button and add event listener to it:
+  const selectLikeBtn = cardTag.querySelector(".like-btn")
+  selectLikeBtn.addEventListener("click", () => {
+    obj.likes += 1;
+    // console.log(obj.like)
+    cardTag.querySelector("p").textContent = obj.likes;
+    updateLikes(obj);
+  })
 }
 
 
 // Fetch Andy's Toys
 function getAllToys() {
-  return fetch("http://localhost:3000/toys")
+  fetch("http://localhost:3000/toys")
   .then(response => response.json())
   .then(toysData => toysData.forEach(toy => renderOneToy(toy)))
-  // .then(toysData => console.log(toysData))
+}
+
+getAllToys()
+
+
+// Update likes number
+function updateLikes(toyObj) {
+  fetch(`http://localhost:3000/toys/${toyObj.id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({
+      "likes": toyObj.likes
+    })
+  })
+  .then(response => response.json())
+  .then(toyData => console.log(toyData))
 }
 
 
-getAllToys()
