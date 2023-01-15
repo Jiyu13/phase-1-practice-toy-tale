@@ -48,8 +48,8 @@ function renderOneToy(obj) {
   const selectLikeBtn = cardTag.querySelector(".like-btn")
   selectLikeBtn.addEventListener("click", () => {
     obj.likes += 1;
-    // console.log(obj.like)
     cardTag.querySelector("p").textContent = obj.likes;
+    toyLikeCount.innerHTML = `${obj.likes} likes`
     updateLikes(obj);
   })
 }
@@ -59,6 +59,7 @@ function renderOneToy(obj) {
 function getAllToys() {
   fetch("http://localhost:3000/toys")
   .then(response => response.json())
+  // .then(toyData => console.log(toyData))
   .then(toysData => toysData.forEach(toy => renderOneToy(toy)))
 }
 
