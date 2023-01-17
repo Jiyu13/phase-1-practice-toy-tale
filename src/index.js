@@ -83,3 +83,39 @@ function updateLikes(toyObj) {
 }
 
 
+// create event listener to "create toy" button
+const createToyForm = document.querySelector(".container")
+let toyCollection = document.querySelector(".toy-collection")
+
+createToyForm.addEventListener("submit", event => {
+  event.preventDefault();
+  postNewToy(event.target) 
+
+})
+
+function postNewToy(toyInfo) {
+  const name = toyInfo.name.value
+  const image = toyInfo.image.value
+ 
+  fetch("http://localhost:3000/toys", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({
+      "name": name,
+      "image": image,
+      "likes": 0,
+    })
+  })
+  .then(response => response.json)
+  .then((toyData) => {
+    let newToy = renderOneToy(toyData);
+    toyCollection.append(newToy)
+
+  })
+}
+
+
+
