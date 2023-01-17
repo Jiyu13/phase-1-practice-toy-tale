@@ -1,13 +1,21 @@
 let addToy = false;
+const addBtn = document.querySelector("#new-toy-btn");
+const toyFormContainer = document.querySelector(".container")
+const toyCollection = document.querySelector("#toy-collection");
 
 document.addEventListener("DOMContentLoaded", () => {
-  const addBtn = document.querySelector("#new-toy-btn");
-  const toyFormContainer = document.querySelector(".container");
   addBtn.addEventListener("click", () => {
     // hide & seek with the form
     addToy = !addToy;
     if (addToy) {
       toyFormContainer.style.display = "block";
+
+      // create event listener to "create toy" button
+      toyFormContainer.addEventListener("submit", event => {
+      event.preventDefault();
+      postNewToy(event.target) 
+      })
+
     } else {
       toyFormContainer.style.display = "none";
     }
@@ -40,13 +48,13 @@ function renderOneToy(obj) {
   cardTag.appendChild(toyLikeBtn)
 
   // Add toy card to DOM
-  const toyCollection = document.querySelector("#toy-collection");
   toyCollection.appendChild(cardTag)
 
 
   // Select like button and add event listener to it:
   const selectLikeBtn = cardTag.querySelector(".like-btn")
-  selectLikeBtn.addEventListener("click", () => {
+  selectLikeBtn.addEventListener("click", (e) => {
+    e.preventDefault()    // pass the event
     obj.likes += 1;
     cardTag.querySelector("p").textContent = obj.likes;
     toyLikeCount.innerHTML = `${obj.likes} likes`
@@ -57,9 +65,8 @@ function renderOneToy(obj) {
 
 // Fetch Andy's Toys
 function getAllToys() {
-  fetch("http://localhost:3000/toys")
+  return fetch("http://localhost:3000/toys")
   .then(response => response.json())
-  // .then(toyData => console.log(toyData))
   .then(toysData => toysData.forEach(toy => renderOneToy(toy)))
 }
 
@@ -67,7 +74,7 @@ getAllToys()
 
 
 // Update likes number
-function updateLikes(toyObj) {
+function updateLikes(toyObj) {  
   fetch(`http://localhost:3000/toys/${toyObj.id}`, {
     method: "PATCH",
     headers: {
@@ -83,37 +90,24 @@ function updateLikes(toyObj) {
 }
 
 
-// create event listener to "create toy" button
-const createToyForm = document.querySelector(".container")
-let toyCollection = document.querySelector(".toy-collection")
-
-createToyForm.addEventListener("submit", event => {
-  event.preventDefault();
-  postNewToy(event.target) 
-
-})
-
 function postNewToy(toyInfo) {
-  const name = toyInfo.name.value
-  const image = toyInfo.image.value
- 
-  fetch("http://localhost:3000/toys", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    },
-    body: JSON.stringify({
-      "name": name,
-      "image": image,
-      "likes": 0,
+  fetch('http://localhost:3000/toys', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: "application/json"
+      },
+      body: JSON.stringify({
+        "name": toyInfo.name.value,
+        "image": toyInfo.image.value,
+        "likes": 0
+
+      })
     })
-  })
-  .then(response => response.json)
+  .then(response => response.json())
   .then((toyData) => {
     let newToy = renderOneToy(toyData);
-    toyCollection.append(newToy)
-
+    // toyCollection.append(newToy) // will show undefined?
   })
 }
 
